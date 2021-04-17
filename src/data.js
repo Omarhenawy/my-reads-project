@@ -1,6 +1,6 @@
 /* cSpell:disable */
 
-const books = [
+const data = [
   {
     title: "The Linux Command Line",
     subtitle: "A Complete Introduction",
@@ -333,4 +333,3 @@ const books = [
     shelf: "read",
   },
 ];
-export default books;

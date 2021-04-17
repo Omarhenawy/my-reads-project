@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useُ } from "react";
 // import * as BooksAPI from './BooksAPI'
 import "./App.css";
-import books from "./data";
-
+import * as BooksAPI from "./BooksAPI";
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
 
 const BooksApp = () => {
@@ -12,14 +11,37 @@ const BooksApp = () => {
     { key: "read", name: "Have Read" },
   ];
   /* cSpell:disable */
-  const Allbooks = books;
+  const [Allbooks, setBooks] = useState([]);
+  const [searchBooks, setSearchBooks] = useState([]);
+
+  useEffect(() => {
+    BooksAPI.getAll().then((books) => {
+      setBooks(books);
+    });
+  }, []);
+
+  const updateBook = (book, shelf) => {
+    BooksAPI.update(book, shelf);
+    const updatedBooks = Allbooks.map((updatedbook) => {
+      if (updatedbook.id === book.id) {
+        updatedbook.shelf = shelf;
+      }
+      return updatedbook;
+    });
+    setBooks(updatedBooks);
+  };
+
   return (
     <div className="app">
       <Route path="/search">
-        <SearchPage />
+        <SearchPage books={Allbooks} onMove={updateBook} />
       </Route>
       <Route exact path="/">
-        <BookList bookshelves={bookshelves} books={Allbooks} />
+        <BookList
+          bookshelves={bookshelves}
+          books={Allbooks}
+          onMove={updateBook}
+        />
       </Route>
     </div>
   );
@@ -27,14 +49,16 @@ const BooksApp = () => {
 
 export default BooksApp;
 
-const BookShelfChanger = ({ shelf }) => {
+const BookShelfChanger = ({ shelf, book, onMove }) => {
   const [currentShelf, setShelf] = useState(shelf);
+
   const HandleChange = (e) => {
     setShelf(e.target.value);
+    onMove(book, e.target.value);
   };
   return (
     <div className="book-shelf-changer">
-      <select value={currentShelf} onChange={() => HandleChange()}>
+      <select value={currentShelf} onChange={HandleChange}>
         <option value="move" disabled>
           Move to...
         </option>
@@ -47,7 +71,7 @@ const BookShelfChanger = ({ shelf }) => {
   );
 };
 
-const Book = ({ book, shelf }) => {
+const Book = ({ book, shelf, onMove }) => {
   return (
     <li>
       <div className="book">
@@ -60,7 +84,7 @@ const Book = ({ book, shelf }) => {
               backgroundImage: `url(${book.imageLinks.thumbnail})`,
             }}
           />
-          <BookShelfChanger shelf={shelf} />
+          <BookShelfChanger shelf={shelf} book={book} onMove={onMove} />
         </div>
         <div className="book-title">{book.title}</div>
         <div className="book-authors">{book.author}</div>
@@ -69,7 +93,7 @@ const Book = ({ book, shelf }) => {
   );
 };
 
-const BookShelf = ({ shelf, books }) => {
+const BookShelf = ({ shelf, books, onMove }) => {
   const bookOnshelf = books.filter((book) => book.shelf === shelf.key);
   return (
     <div className="bookshelf">
@@ -77,7 +101,14 @@ const BookShelf = ({ shelf, books }) => {
       <div className="bookshelf-books">
         <ol className="books-grid">
           {bookOnshelf.map((book) => {
-            return <Book key={book.id} book={book} shelf={shelf.key} />;
+            return (
+              <Book
+                key={book.id}
+                book={book}
+                shelf={shelf.key}
+                onMove={onMove}
+              />
+            );
           })}
         </ol>
       </div>
@@ -95,7 +126,7 @@ const AddBookButton = () => {
   );
 };
 
-const BookList = ({ bookshelves, books }) => {
+const BookList = ({ bookshelves, books, onMove }) => {
   return (
     <div className="list-books">
       <div className="list-books-title">
@@ -104,7 +135,14 @@ const BookList = ({ bookshelves, books }) => {
       <div className="list-books-content">
         <div>
           {bookshelves.map((shelf) => {
-            return <BookShelf key={shelf.key} shelf={shelf} books={books} />;
+            return (
+              <BookShelf
+                key={shelf.key}
+                shelf={shelf}
+                books={books}
+                onMove={onMove}
+              />
+            );
           })}
           ;
         </div>
@@ -114,11 +152,13 @@ const BookList = ({ bookshelves, books }) => {
   );
 };
 
-const SearchResults = () => {
+const SearchResults = ({ books }) => {
   return (
     <div className="search-books-results">
       <ol className="books-grid">
-        <Book />
+        {books.map((book) => {
+          return <Book id={book.id} book={book} shelf="none" />;
+        })}
       </ol>
     </div>
   );
@@ -157,11 +197,11 @@ const SearchBar = () => {
   );
 };
 
-const SearchPage = () => {
+const SearchPage = ({ books, onMove }) => {
   return (
     <div className="search-books">
-      <SearchBar />
-      <SearchResults />
+      <SearchBar books={books} />
+      <SearchResults books={books} onMove={onMove} />
     </div>
   );
 };
