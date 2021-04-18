@@ -3,6 +3,7 @@ import React, { useEffect, useState, useُ } from "react";
 import "./App.css";
 import * as BooksAPI from "./BooksAPI";
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+import { debounce } from "throttle-debounce";
 
 const BooksApp = () => {
   const bookshelves = [
@@ -12,13 +13,22 @@ const BooksApp = () => {
   ];
   /* cSpell:disable */
   const [Allbooks, setBooks] = useState([]);
-  const [searchBooks, setSearchBooks] = useState([]);
+  const [searchedBooks, setsearchedBooks] = useState([]);
 
   useEffect(() => {
     BooksAPI.getAll().then((books) => {
       setBooks(books);
     });
   }, []);
+  const searchBooks = debounce(200, false, (query) => {
+    if (query.length > 0) {
+      BooksAPI.search(query).then((books) => {
+        setsearchedBooks(books);
+      });
+    } else {
+      setsearchedBooks([]);
+    }
+  });
 
   const updateBook = (book, shelf) => {
     BooksAPI.update(book, shelf);
@@ -34,7 +44,11 @@ const BooksApp = () => {
   return (
     <div className="app">
       <Route path="/search">
-        <SearchPage books={Allbooks} onMove={updateBook} />
+        <SearchPage
+          books={searchedBooks}
+          onMove={updateBook}
+          search={searchBooks}
+        />
       </Route>
       <Route exact path="/">
         <BookList
@@ -87,7 +101,9 @@ const Book = ({ book, shelf, onMove }) => {
           <BookShelfChanger shelf={shelf} book={book} onMove={onMove} />
         </div>
         <div className="book-title">{book.title}</div>
-        <div className="book-authors">{book.author}</div>
+        <div className="book-authors">
+          {book.authors && book.authors.join(", ")}
+        </div>
       </div>
     </li>
   );
@@ -164,7 +180,9 @@ const SearchResults = ({ books }) => {
   );
 };
 
-const SearchInput = () => {
+const SearchInput = ({ books, search }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  search(searchTerm);
   return (
     <div className="search-books-input-wrapper">
       {/*
@@ -175,7 +193,16 @@ const SearchInput = () => {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-      <input type="text" placeholder="Search by title or author" />
+      <input
+        type="text"
+        placeholder="Search by title or author"
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          {
+            console.log(searchTerm);
+          }
+        }}
+      />
     </div>
   );
 };
@@ -188,19 +215,19 @@ const SearchBackButton = () => {
   );
 };
 
-const SearchBar = () => {
+const SearchBar = ({ books, onMove, search }) => {
   return (
     <div className="search-books-bar">
       <SearchBackButton />
-      <SearchInput />
+      <SearchInput books={books} onMove={{ books, onMove }} search={search} />
     </div>
   );
 };
 
-const SearchPage = ({ books, onMove }) => {
+const SearchPage = ({ books, onMove, search }) => {
   return (
     <div className="search-books">
-      <SearchBar books={books} />
+      <SearchBar books={books} search={search} />
       <SearchResults books={books} onMove={onMove} />
     </div>
   );
