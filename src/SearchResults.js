@@ -13,7 +13,12 @@ const SearchResults = ({ searchedBooks, onMove, books }) => {
       <ol className="books-grid">
         {searchedBooks.map((book) => {
           return (
-            <Book key={book.id} book={book} shelf="none" onMove={onMove} />
+            <Book
+              key={book.id}
+              book={book}
+              shelf={book.shelf ? book.shelf : "none"}
+              onMove={onMove}
+            />
           );
         })}
       </ol>

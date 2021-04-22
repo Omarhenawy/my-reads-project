@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 const SearchInput = ({ books, search, searchBooks }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  search(searchTerm);
 
   return (
     <div className="search-books-input-wrapper">
@@ -18,6 +17,7 @@ const SearchInput = ({ books, search, searchBooks }) => {
         placeholder="Search by title or author"
         onChange={(e) => {
           setSearchTerm(e.target.value);
+          search(searchTerm);
         }}
       />
     </div>
