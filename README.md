@@ -41,4 +41,4 @@ Hooks is used in this app specially useState
 
 ## to start this app
 
-npm install
+npm start
