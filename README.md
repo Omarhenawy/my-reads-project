@@ -22,6 +22,9 @@ this is the second project of my advanced web development diploma with egfwd
     ├── BookSHelf Changer # this component to change the shelf of the book.
     ├── SearchPage # this is the page component
     ├── searchResults # results of the search of the input
+    ├── searchInput # responsible for the input of the search page
+    ├── SearchBackButton # responsible for the back button
+    ├── searchResults # results of the search of the input
     ├── icons # Helpful images for your app. Use at your discretion.
     │   ├── add.svg
     │   ├── arrow-back.svg
@@ -35,3 +38,7 @@ Remember that good React design practice is to create new JS files for each comp
 ## Hooks
 
 Hooks is used in this app specially useState
+
+## to start this app
+
+npm install
