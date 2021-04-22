@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useُ } from "react";
+import React, { useEffect, useState } from "react";
 // import * as BooksAPI from './BooksAPI'
 import "./App.css";
 import * as BooksAPI from "./BooksAPI";
-import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Link, Route } from "react-router-dom";
 import { debounce } from "throttle-debounce";
 
 import SearchPage from "./SearchPage";

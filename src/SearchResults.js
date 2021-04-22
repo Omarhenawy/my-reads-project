@@ -1,11 +1,13 @@
 import Book from "./Book";
 const SearchResults = ({ searchedBooks, onMove, books }) => {
-  const shelfBook = searchedBooks.map((book) => {
+  searchedBooks.map((book) => {
     books.map((onShelf) => {
       if (onShelf.id === book.id) {
         book.shelf = onShelf.shelf;
       }
+      return onShelf;
     });
+    return book;
   });
 
   return (
