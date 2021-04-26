@@ -43,3 +43,7 @@ Hooks is used in this app specially useState
 
 npm install
 npm start
+
+## to see this live
+
+https://flamboyant-bell-8e4e1a.netlify.app/
